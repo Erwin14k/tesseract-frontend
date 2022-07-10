@@ -2,23 +2,28 @@ import React, { useState } from "react";
 import TodoForm from "./TodoForm";
 import Todo from "./Todo";
 import { useEffect } from "react";
+import axios from "axios";
+import { getTodos, updateTodoData } from "../lib/api";
 
 function TodoList() {
   const [todos, setTodos] = useState([]);
 
   useEffect(() => {
-    console.log(todos);
-  }, [todos]);
+    getTodos()
+      .then((todos) => setTodos(todos))
+      .catch((error) => alert(error.message));
+  }, []);
 
   const addTodo = (todo) => {
-    if (!todo.text || /^\s*$/.test(todo.text)) {
+    if (!todo.title || /^\s*$/.test(todo.title)) {
       return;
     }
 
-    const newTodos = [todo, ...todos];
-
-    setTodos(newTodos);
-    console.log(...todos);
+    axios.post("http://localhost:3000/api/v1/to-dos", { ...todo }).then(() => {
+      getTodos()
+        .then((todos) => setTodos(todos))
+        .catch((error) => alert(error.message));
+    });
   };
 
   const showDescription = (todoId) => {
@@ -31,30 +36,36 @@ function TodoList() {
     setTodos(updatedTodos);
   };
 
-  const updateTodo = (todoId, newValue) => {
-    if (!newValue.text || /^\s*$/.test(newValue.text)) {
+  const updateTodo = (todoId, { title, description }) => {
+    if (!title || /^\s*$/.test(title)) {
       return;
     }
 
-    setTodos((prev) =>
-      prev.map((item) => (item.id === todoId ? newValue : item))
-    );
+    updateTodoData(todoId, { title, description })
+      .then(() => {
+        getTodos()
+          .then((todos) => setTodos(todos))
+          .catch((error) => alert(error.message));
+      })
+      .catch((error) => alert(error.message));
   };
 
   const removeTodo = (id) => {
-    const removedArr = [...todos].filter((todo) => todo.id !== id);
-
-    setTodos(removedArr);
+    axios.delete(`http://localhost:3000/api/v1/to-dos/${id}`).then(() => {
+      getTodos()
+        .then((todos) => setTodos(todos))
+        .catch((error) => alert(error.message));
+    });
   };
 
-  const completeTodo = (id) => {
-    let updatedTodos = todos.map((todo) => {
-      if (todo.id === id) {
-        todo.isComplete = !todo.isComplete;
-      }
-      return todo;
-    });
-    setTodos(updatedTodos);
+  const completeTodo = (id, is_done) => {
+    updateTodoData(id, { isDone: is_done === 1 ? 0 : 1 })
+      .then(() => {
+        getTodos()
+          .then((todos) => setTodos(todos))
+          .catch((error) => alert(error.message));
+      })
+      .catch((error) => alert(error.message));
   };
 
   return (
