@@ -30,7 +30,6 @@ const Todo = ({
   if (edit.id) {
     return <TodoForm edit={edit} onSubmit={submitUpdate} />;
   }
-  //console.log(todos);
 
   return todos.map((todo, index) => (
     // <div>
@@ -70,6 +69,12 @@ const Todo = ({
             className="edit-icon"
           />
         </div>
+      </div>
+      <div className="description">
+        Creation Date: {todo.date_of_creation}
+      </div>
+      <div className="description">
+        Last Update: {todo.date_of_update}
       </div>
       {todo.showDescription && (
         <div

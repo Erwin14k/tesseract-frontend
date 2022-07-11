@@ -38,6 +38,7 @@ function TodoList() {
 
   const updateTodo = (todoId, { title, description }) => {
     if (!title || /^\s*$/.test(title)) {
+      //console.log("jjj")
       return;
     }
 
